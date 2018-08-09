@@ -24,7 +24,7 @@ static int process_callback(jack_nframes_t nframes, void *arg)
     // cosine: y[i]
 
     // Flip indexes every frame
-    fcv->index = !fcv->index;
+    fcv->index = !(fcv->index);
   }
   
   // Copy events from the input to the output.
@@ -66,7 +66,7 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->x[0] = 0.0;
   fcv->x[1] = 0.0;
   fcv->y[0] = 0.0;
-  fcv->y[0] = 1.0;
+  fcv->y[1] = 1.0;
   
   // Set port aliases
   jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV playback");
