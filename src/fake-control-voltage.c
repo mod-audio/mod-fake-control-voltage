@@ -120,10 +120,10 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   // Register ports.
   fcv->ports[PORT_CAPTURE] = jack_port_register(client, "capture",
 					  JACK_DEFAULT_AUDIO_TYPE,
-					  JackPortIsPhysical | JackPortIsInput, 0);
+					  JackPortIsPhysical | JackPortIsInput | JackPortIsControlVoltage, 0);
   fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "playback",
 					   JACK_DEFAULT_AUDIO_TYPE,
-					   JackPortIsPhysical | JackPortIsOutput, 0);
+					   JackPortIsPhysical | JackPortIsOutput | JackPortIsControlVoltage, 0);
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
     if (!fcv->ports[i]) {
       fprintf(stderr, "Can't register jack port\n");

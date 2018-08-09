@@ -11,6 +11,8 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+#define JackPortIsControlVoltage 0x100
+
 enum Ports {
     PORT_CAPTURE,
     PORT_PLAYBACK,
