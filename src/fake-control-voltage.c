@@ -1,79 +1,6 @@
 #include <math.h>
 #include "fake-control-voltage.h"
 
-/**
- * Add a port_id to the waiting queue.
- * It is a producer in the realtime context.
- */
-size_t push_back(jack_ringbuffer_t *queue, jack_port_id_t port_id) {
-  size_t written = 0;
-  
-  if (queue == NULL) {
-    fprintf(stderr, "Could not schedule port connection.\n");
-  } else {
-
-    // Check if there is space to write
-    size_t write_space = jack_ringbuffer_write_space(queue);
-    if (write_space >= sizeof(jack_port_id_t)) {
-      written = jack_ringbuffer_write(queue,
-				      &port_id,
-				      sizeof(jack_port_id_t));
-      if (written < sizeof(jack_port_id_t)) {
-	fprintf(stderr, "Could not schedule port connection.\n");
-      }
-    }    
-  }
-  return written;
-}
-
-
-/**
- * Return the next port_id or NULL if empty.
- */
-jack_port_id_t next(jack_ringbuffer_t *queue) {
-  size_t read = 0;
-  jack_port_id_t id = NULL;
-  
-  if (queue == NULL) {
-    fprintf(stderr, "Queue memory problem.\n");
-  } else {
-    char buffer[sizeof(jack_port_id_t)];
-    read = jack_ringbuffer_read(queue, buffer, sizeof(jack_port_id_t));
-    if (read == sizeof(jack_port_id_t)) {
-      id = (jack_port_id_t) *buffer;      
-    }
-  }
-  return id;
-}
-
-
-/**
- * Connect any outstanding Jack ports.
- * It is a consumer in the non-realtime context.
- */
-void handle_scheduled_connections(fake_control_voltage_t *const mm) {
-  // Check if there are connections scheduled.
-  jack_port_id_t source = next(mm->ports_to_connect);
-
-  if (source != NULL) {
-    int result;
-    result = jack_connect(mm->client,
-			  jack_port_name(jack_port_by_id(mm->client, source)),
-			  jack_port_name(mm->ports[PORT_CAPTURE]));
-    switch(result) {
-    case 0:
-      // Fine.
-      break;
-    case EEXIST:
-      fprintf(stderr, "Connection exists.\n");
-      break;
-    default:
-      fprintf(stderr, "Could not connect port.\n");
-      break;
-    }
-  }
-}
-
 
 static int process_callback(jack_nframes_t nframes, void *arg)
 {
@@ -144,11 +71,6 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   // Set port aliases
   jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV playback");
   jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV capture");
-
-  // Create the ringbuffer (single-producer/single-consumer) for
-  // scheduled port connections. It contains elements of type
-  // `jack_port_id_t`.
-  fcv->ports_to_connect = jack_ringbuffer_create(queue_size);
   
   // Set callbacks
   jack_set_process_callback(client, process_callback, fcv);
@@ -159,8 +81,6 @@ int jack_initialize(jack_client_t* client, const char* load_init)
     free(fcv);
     return EXIT_FAILURE;
   }
-
-  // TODO: Schedule already existing ports for connection.
   
   return 0;
 }
@@ -175,8 +95,6 @@ void jack_finish(void* arg)
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
     jack_port_unregister(fcv->client, fcv->ports[i]);
   }
-
-  jack_ringbuffer_free(fcv->ports_to_connect);
   
   free(fcv);
 }

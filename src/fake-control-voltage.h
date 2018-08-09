@@ -24,7 +24,6 @@ static const size_t queue_size = 64*sizeof(jack_port_id_t);
 typedef struct FAKE_CONTROL_VOLTAGE_T {
   jack_client_t *client;
   jack_port_t *ports[PORT_ARRAY_SIZE];
-  jack_ringbuffer_t *ports_to_connect;
 
   float sample_rate;
   float frequency;
