@@ -69,8 +69,8 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->y[1] = 1.0;
   
   // Set port aliases
-  jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV playback");
-  jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV capture");
+  jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV capture");
+  jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV playback");
   
   // Set callbacks
   jack_set_process_callback(client, process_callback, fcv);
