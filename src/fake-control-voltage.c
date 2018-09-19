@@ -44,11 +44,11 @@ int jack_initialize(jack_client_t* client, const char* load_init)
 
   fcv->client = client;
  
-  // Register ports.
-  fcv->ports[PORT_CAPTURE] = jack_port_register(client, "cv_capture_1",
+  // Register ports. Since this simulates hardware the output is called "capture"!
+  fcv->ports[PORT_CAPTURE] = jack_port_register(client, "cv_playback_1",
 					  JACK_DEFAULT_AUDIO_TYPE,
 					  JackPortIsPhysical | JackPortIsInput | JackPortIsControlVoltage, 0);
-  fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "cv_playback_1",
+  fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "cv_capture_1",
 					   JACK_DEFAULT_AUDIO_TYPE,
 					   JackPortIsPhysical | JackPortIsOutput | JackPortIsControlVoltage, 0);
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
@@ -69,8 +69,8 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->y[1] = 1.0;
   
   // Set port aliases
-  jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV capture");
-  jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV playback");
+  jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV playback");
+  jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV capture");
   
   // Set callbacks
   jack_set_process_callback(client, process_callback, fcv);
