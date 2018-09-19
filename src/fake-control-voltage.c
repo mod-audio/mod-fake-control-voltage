@@ -45,10 +45,10 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->client = client;
  
   // Register ports.
-  fcv->ports[PORT_CAPTURE] = jack_port_register(client, "capture",
+  fcv->ports[PORT_CAPTURE] = jack_port_register(client, "cv_capture_1",
 					  JACK_DEFAULT_AUDIO_TYPE,
 					  JackPortIsPhysical | JackPortIsInput | JackPortIsControlVoltage, 0);
-  fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "playback",
+  fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "cv_playback_1",
 					   JACK_DEFAULT_AUDIO_TYPE,
 					   JackPortIsPhysical | JackPortIsOutput | JackPortIsControlVoltage, 0);
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
