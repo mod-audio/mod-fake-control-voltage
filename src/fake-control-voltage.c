@@ -47,10 +47,10 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   // Register ports. Since this simulates hardware the output is called "capture"!
   fcv->ports[PORT_CAPTURE] = jack_port_register(client, "cv_playback_1",
 					  JACK_DEFAULT_AUDIO_TYPE,
-					  JackPortIsPhysical | JackPortIsInput | JackPortIsControlVoltage, 0);
+					  JackPortIsPhysical | JackPortIsInput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
   fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "cv_capture_1",
 					   JACK_DEFAULT_AUDIO_TYPE,
-					   JackPortIsPhysical | JackPortIsOutput | JackPortIsControlVoltage, 0);
+					   JackPortIsPhysical | JackPortIsOutput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
     if (!fcv->ports[i]) {
       fprintf(stderr, "Can't register jack port\n");
