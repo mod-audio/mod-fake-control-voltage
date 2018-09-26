@@ -22,7 +22,7 @@ $ cmake --build .
 to install the shared library in `/usr/lib/jack/mod-fake-contol-voltage.so` run
 
 ```bash
-$ make install
+$ sudo make install
 ```
 
 ## Run
