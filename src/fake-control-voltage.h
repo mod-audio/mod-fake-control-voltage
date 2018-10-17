@@ -14,8 +14,10 @@
 #define JackPortIsControlVoltage 0x100
 
 enum Ports {
-    PORT_CAPTURE,
-    PORT_PLAYBACK,
+    PORT_CAPTURE1,
+    PORT_CAPTURE2,
+    PORT_PLAYBACK1,
+    PORT_PLAYBACK2,
     PORT_ARRAY_SIZE // this is not used as a port index
 };
 

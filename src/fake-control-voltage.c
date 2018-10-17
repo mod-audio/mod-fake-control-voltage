@@ -7,7 +7,7 @@ static int process_callback(jack_nframes_t nframes, void *arg)
   fake_control_voltage_t *const fcv = (fake_control_voltage_t *const) arg;
 
   // Get the output buffer once per cycle.
-  float *sine_buffer = (float *) jack_port_get_buffer(fcv->ports[PORT_PLAYBACK], nframes);
+  float *sine_buffer = (float *) jack_port_get_buffer(fcv->ports[PORT_PLAYBACK1], nframes);  
 
   // See Smith & Cook "The Second-Order Digital Waveguide Oscillator" 1992,
   // https://ccrma.stanford.edu/~jos/wgo/wgo.pdf, p. 2 
@@ -28,7 +28,8 @@ static int process_callback(jack_nframes_t nframes, void *arg)
   }
   
   // Copy events from the input to the output.
-  void *input_port_buffer = jack_port_get_buffer(fcv->ports[PORT_CAPTURE], nframes);
+  void *input_port_buffer1 = jack_port_get_buffer(fcv->ports[PORT_CAPTURE1], nframes);
+  void *input_port_buffer2 = jack_port_get_buffer(fcv->ports[PORT_CAPTURE2], nframes);
 
   return 0;
 }
@@ -45,10 +46,16 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->client = client;
  
   // Register ports. Since this simulates hardware the output is called "capture"!
-  fcv->ports[PORT_CAPTURE] = jack_port_register(client, "cv_playback_1",
+  fcv->ports[PORT_CAPTURE1] = jack_port_register(client, "cv_playback_1",
 					  JACK_DEFAULT_AUDIO_TYPE,
 					  JackPortIsPhysical | JackPortIsInput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
-  fcv->ports[PORT_PLAYBACK] = jack_port_register(client, "cv_capture_1",
+  fcv->ports[PORT_CAPTURE2] = jack_port_register(client, "cv_playback_2",
+					  JACK_DEFAULT_AUDIO_TYPE,
+					  JackPortIsPhysical | JackPortIsInput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
+  fcv->ports[PORT_PLAYBACK1] = jack_port_register(client, "cv_capture_1",
+					   JACK_DEFAULT_AUDIO_TYPE,
+					   JackPortIsPhysical | JackPortIsOutput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
+  fcv->ports[PORT_PLAYBACK2] = jack_port_register(client, "cv_capture_2",
 					   JACK_DEFAULT_AUDIO_TYPE,
 					   JackPortIsPhysical | JackPortIsOutput | JackPortIsTerminal | JackPortIsControlVoltage, 0);
   for (int i = 0; i < PORT_ARRAY_SIZE; ++i) {
@@ -69,8 +76,10 @@ int jack_initialize(jack_client_t* client, const char* load_init)
   fcv->y[1] = 1.0;
   
   // Set port aliases
-  jack_port_set_alias(fcv->ports[PORT_CAPTURE], "CV playback");
-  jack_port_set_alias(fcv->ports[PORT_PLAYBACK], "CV capture");
+  jack_port_set_alias(fcv->ports[PORT_CAPTURE1], "CV playback 1");
+  jack_port_set_alias(fcv->ports[PORT_CAPTURE2], "CV playback 2");  
+  jack_port_set_alias(fcv->ports[PORT_PLAYBACK1], "CV capture 1");
+  jack_port_set_alias(fcv->ports[PORT_PLAYBACK2], "CV capture 2");
   
   // Set callbacks
   jack_set_process_callback(client, process_callback, fcv);
